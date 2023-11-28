@@ -1,0 +1,53 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ProductModalTitle">DELETE PRODUCT</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are You Sure You Want to Delete...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
+                <button type="button" id="pmodelbtnsubmit" class="btn btn-primary">YES</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // ----------- DELETE AJAX -------------
+
+    $(document).on("click", "#pmodelbtnsubmit", function () {
+
+        $.ajax({
+            url: "@Url.Action("JsonDelete","Product")",
+            type: "POST",
+            success: function (resp) {
+                if (resp.response) {
+                    console.log(resp);
+                    toastr.success("Record Deleted");
+                } else {
+
+                    toastr.error("Record Deleting Failed");
+
+                }
+            },
+            error: function () {
+                toastr.error("Data Not Found");
+            }
+        });
+
+    });
+
+</script>

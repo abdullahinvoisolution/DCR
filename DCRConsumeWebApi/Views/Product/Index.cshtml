@@ -1,0 +1,181 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!-------------- Table ----------------->
+<main class="content px-3 py-2">
+    <div class="container-fluid">
+        <div class="mb-3">
+            <div class="form-inline justify-content-between col-md-12 mb-2">
+                <div class="button">
+                    <button type="button" data-toggle="modal" data-target="#exampleModalCenter"
+                            class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-plus"></i> Add Product
+                    </button>
+                </div>
+                <section class="ModalSection">
+                </section>
+            </div>
+
+            <!-------------- Table ----------------->
+            <div class="container-fluid">
+                <div class="tablecard small col-md-12">
+                    <table id="producttable" class="table table-striped table-bordered small">
+                        <thead>
+                            <tr class="font-weight-bold">
+                                <th>Product ID</th>
+                                <th>Product Type</th>
+                                <th>Material ID</th>
+                                <th>Product Price</th>
+                                <th>Product SKU</th>
+                                <th>Product Code</th>
+                                <th>Market Name</th>
+                                <th>Brand</th>
+                                <th>Memory</th>
+                                <th>Model</th>
+                                <th>Color</th>
+                                <th>Series</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="ProductTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+
+
+
+
+<script>
+    // ----------- GET Data FROM API -------------
+
+    $(document).ready(function () {
+        $('#producttable').DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            filter: true,
+            lengthMenu: [
+                [10, 20, 50, 75, 100, -1],
+                [10, 20, 50, 75, 100, "All"]
+            ],
+            pageLength: 10,
+            scrollX: true,
+            ajax: {
+                url: '@Url.Action("GetProducts","Product")',
+                type: "POST"
+            },
+            columns: [
+                { data: "productId", "name": "ProductId" },
+                { data: "productType", "name": "ProductType" },
+                { data: "materialId", "name": "MaterialId" },
+                { data: "productPrice", "name": "ProductPrice" },
+                { data: "productSku", "name": "ProductSku" },
+                { data: "productCode", "name": "ProductCode" },
+                { data: "marketName", "name": "MarketName" },
+                { data: "brand", "name": "Brand" },
+                { data: "memory", "name": "Memory" },
+                { data: "model", "name": "Model" },
+                { data: "color", "name": "Color" },
+                { data: "series", "name": "Series" },
+                {
+                    data: "productId", render: function (data, type, row, meta) {
+                        return "<button class='btn btn-primary btnEdit'  data-productid='" + data + "'><i class='fa fa-edit'></i></button>" +
+                            "<button class='btn btn-danger btnDelete' data-productid='" + data + "'><i class='fa fa-trash'></i></button>"
+                    }
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: [0],
+                    // visible: false,
+                    searchable: false
+                }
+            ]
+        });
+    });
+
+
+    // ----------- EDIT AJAX -------------
+
+    $(document).on("click", ".btnEdit", function () {
+        var Id = $(this).attr("data-productid");
+
+        $.ajax({
+            url: '/Product/JsonGetProduct',
+            type: 'POST',
+            data: { productId: Id },
+            datatype: 'application/json',
+            success: function (resp) {
+                console.log(resp);
+                if (resp != null) {
+                    // resp = JSON.parse(resp.response);
+                    // $("#productid").val(resp.productId);
+                    // $("#producttype").val(resp.productType);
+                    // $("#materialId").val(resp.materialId);
+                    // $("#productprice").val(resp.productPrice);
+                    // $("#productsku").val(resp.productSku);
+                    // $("#productcode").val(resp.productCode);
+                    // $("#pmarketname").val(resp.marketName);
+                    // $("#pbrand").val(resp.brand);
+                    // $("#pmemory").val(resp.memory);
+                    // $("#pmodel").val(resp.model);
+                    // $("#pcolor").val(resp.color);
+                    // $("#pmodel").val(resp.model);
+                    // $("#pseries").val(resp.series);
+
+                    $(".ModalSection").html(resp);
+                    $("#exampleModalCenter").modal('show');
+                } else {
+                    $("#exampleModalCenter").modal('hide');
+                    toastr.error("Fetching Data Failed");
+                }
+            }
+        });
+
+    });
+
+
+
+    // ----------- DELETE AJAX -------------
+
+    $(document).on("click", ".btnDelete", function () {
+        var id = $(this).attr("data-productid");
+
+        if (confirm("Are you sure you want to delete this record?")) {
+            $.ajax({
+                url: "/Product/JsonDelete",
+                type: "POST",
+                data: { ProductId: id },
+                success: function (resp) {
+                    if (resp.response) {
+                        console.log(resp);
+                        toastr.success("Record Deleted");
+                    } else {
+
+                        toastr.error("Record Deleting Failed");
+
+                    }
+                },
+                error: function () {
+                    toastr.error("Data Not Found");
+                }
+            });
+        }
+    });
+
+
+
+
+
+
+</script>
